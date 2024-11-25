@@ -7,7 +7,7 @@ const productSchema = new mongoose.Schema({
         required: true,
     },
     price: {
-        type: number,
+        type: Number,
         required: true,
     },
     image: {
@@ -18,7 +18,8 @@ const productSchema = new mongoose.Schema({
     timestamps: true // createdAt, updatedAt
 });
 
-// create product using the productSchema as a parameter
+// create product using the productSchema as a parameter 
+/// converts Product in "products"
 const Product = mongoose.model('Product', productSchema);
 
 export default Product;
