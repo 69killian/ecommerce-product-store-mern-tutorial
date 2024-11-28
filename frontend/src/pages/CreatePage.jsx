@@ -26,10 +26,9 @@ const CreatePage = () => {
       toast.error(message || "An error occurred while creating the product.", {
         duration: 4000,
         position: "top-right",
-        isClosable:true,
         style: {
-          backgroundColor: "#880808", // Fond rouge pour les erreurs
-          color: "white", // Texte blanc
+          backgroundColor: "#880808",
+          color: "red", // Texte blanc
           fontWeight: "bold", // Texte en gras
         },
       });
@@ -39,10 +38,9 @@ const CreatePage = () => {
     toast.success(message || "The product has been successfully created.", {
       duration: 4000,
       position: "top-right",
-      isClosable:true,
       style: {
-        backgroundColor: "0f430f", // Fond vert pour les succès
-        color: "white", // Texte blanc
+        backgroundColor: "0f430f",
+        color: "green", // Texte blanc
         fontWeight: "bold", // Texte en gras
       },
     });

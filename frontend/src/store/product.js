@@ -30,6 +30,26 @@ export const useProductStore = create((set) => ({
         const res = await fetch("/api/products");
         const data = await res.json();
         set({products: data.data});
-    }
+    },
+    deleteProduct: async (pid) => {
+        const res = await fetch(`/api/products/${pid}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) {
+          // Si la requête échoue, renvoie une erreur
+          return { success: false, message: "Failed to delete the product." };
+        }
+        const data = await res.json();
+        if (!data.success) {
+          return { success: false, message: data.message || "Product deletion failed." };
+        }
+        
+        // Mise à jour de l'état pour supprimer le produit sans réactualisation de la page
+        set((state) => ({
+          products: state.products.filter((product) => product._id !== pid),
+        }));
+        return { success: true, message: "Product deleted successfully." };
+      },
+
   }));
   
