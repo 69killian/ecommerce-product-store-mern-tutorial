@@ -1,17 +1,32 @@
 
-import { Box, Image, Heading, Text, HStack, Button } from "@chakra-ui/react";
+import { Box, Image, Heading, Text, HStack, Button, VStack, Input } from "@chakra-ui/react";
 import { FaRegEdit } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import { useColorModeValue } from "../components/ui/color-mode";
 import { useProductStore } from "../store/product";
 import { Toaster } from "react-hot-toast";
 import toast from "react-hot-toast";
+import { useState } from 'react';
+import {
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter
+  } from '@chakra-ui/modal';
 
 const ProductCard = ({product}) => {
+    const [updatedProduct, setUpdatedProduct] = useState(product);
     const textColor = useColorModeValue("gray.600", "gray.200");
     const bg = useColorModeValue("white", "gray.800");
 
-    const { deleteProduct } = useProductStore();
+    const [isModalOpen, setIsModalOpen] = useState(false); 
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+
+
+    const { deleteProduct, updateProduct } = useProductStore();
     const handleDeleteProduct = async (pid) => {
         const { success, message } = await deleteProduct(pid);
       
@@ -42,6 +57,40 @@ const ProductCard = ({product}) => {
           await fetchProducts();
         }
       };
+
+
+
+
+      const handleUpdateProduct = async (pid, updatedProduct) => {
+        const {success, message} = await updateProduct(pid, updatedProduct);
+        closeModal();
+        if (success) {
+            // Toast d'erreur
+            toast.error(message || "An error occurred while updating the product.", {
+              duration: 4000,
+              position: "top-right",
+              style: {
+                backgroundColor: "#880808", // Fond rouge pour les erreurs
+                color: "red", // Texte blanc
+                fontWeight: "bold", // Texte en gras
+              },
+            });
+            return;
+          } else {
+            // Toast de succès
+            toast.success(message || "The product has been successfully updated.", {
+              duration: 4000,
+              position: "top-right",
+              style: {
+                backgroundColor: "#0f430f", // Fond vert pour succès
+                color: "green", // Texte blanc
+                fontWeight: "bold", // Texte en gras
+              }
+            });
+            const { fetchProducts } = useProductStore.getState(); // Accès direct au store Zustand
+            await fetchProducts();
+          }
+      }
       
       
   return (
@@ -76,7 +125,7 @@ const ProductCard = ({product}) => {
 
       <HStack spacing={2}>
         {/* Edit Button */}
-        <Button
+        <Button onClick={openModal}
           colorScheme="green"
           variant="outline"
           borderColor="green.700"
@@ -109,6 +158,81 @@ const ProductCard = ({product}) => {
         </Button>
       </HStack>
     </Box>
+
+    <Modal isOpen={isModalOpen} onClose={closeModal}>
+  <ModalOverlay
+    display="flex !important" 
+    alignItems="center" 
+    justifyContent="center" 
+  />
+  <ModalContent
+    maxWidth="400px" 
+    borderRadius="md" 
+    bg={useColorModeValue("#f4f4f5", "#18181b")} 
+    p={4} 
+    boxShadow="lg" 
+  >
+    <ModalHeader
+      textAlign="center"
+      fontWeight="bold"
+      fontSize="lg"
+      color={useColorModeValue("black", "white")} 
+    >
+      Update Product
+    </ModalHeader>
+    <ModalBody>
+      <VStack spacing={4} align="stretch">
+        <Input
+          placeholder="Product Name"
+          name="name"
+          value={updatedProduct.name}
+          onChange={(e) =>
+            setUpdatedProduct({ ...updatedProduct, name: e.target.value })
+          }
+          focusBorderColor="blue.400" 
+        />
+        <Input
+          placeholder="Price"
+          name="price"
+          type="number"
+          value={updatedProduct.price}
+          onChange={(e) =>
+            setUpdatedProduct({ ...updatedProduct, price: e.target.value })
+          }
+          focusBorderColor="blue.400"
+        />
+        <Input
+          placeholder="Image URL"
+          name="image"
+          value={updatedProduct.image}
+          onChange={(e) =>
+            setUpdatedProduct({ ...updatedProduct, image: e.target.value })
+          }
+          focusBorderColor="blue.400"
+        />
+      </VStack>
+    </ModalBody>
+
+    <ModalFooter justify="center">
+      <Button
+        colorScheme="blue"
+        mr={3}
+        onClick={() => {
+          handleUpdateProduct(product._id, updatedProduct);
+          closeModal();
+        }}
+      >
+        Update
+      </Button>
+      <Button variant="ghost" onClick={closeModal}>
+        Cancel
+      </Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+
+    
+
     <Toaster position="top-right" reverseOrder={false} />
     </>
   )
