@@ -171,6 +171,11 @@ const ProductCard = ({product}) => {
     bg={useColorModeValue("#f4f4f5", "#18181b")} 
     p={4} 
     boxShadow="lg" 
+    position="absolute"
+    top="50%"
+    left="40%"
+    border={`1px solid ${useColorModeValue("#ccc", "#555")}`}
+    borderRadius="5px"
   >
     <ModalHeader
       textAlign="center"
